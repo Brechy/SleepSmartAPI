@@ -1,2 +1,2 @@
 # SleepSmartAPI
-Python/Flask/RESTPlus API for SleepSmart project.
+Python/Flask/REST API for SleepSmart project.
