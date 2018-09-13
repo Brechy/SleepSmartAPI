@@ -6,11 +6,13 @@ import urllib
 from pprint import pprint
 
 from flask import Flask, jsonify
-import xmltodict
 import requests
+import xmltodict
 
 from dotenv import load_dotenv
 
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 def sha256(q_q):
@@ -23,9 +25,6 @@ def make_utf8(q_q):
         q_q = str(q_q).encode('utf-8')
     return q_q
 
-
-logging.basicConfig(level=logging.DEBUG)
-
 # refers to application_top
 APP_ROOT = os.path.join(os.path.dirname(__file__), '.')
 DOTENV_PATH = os.path.join(APP_ROOT, '.env')
@@ -33,12 +32,12 @@ load_dotenv(DOTENV_PATH)
 
 APP = Flask(__name__)
 
-print(os.getenv('PLEX_URL'))
+pprint(os.getenv('PLEX_URL'))
 
 
 
 def change_path(url, new_path, add_query_params=None):
-    """Change a url's path and add query params"""
+    """Change a url's path and add query params/custom headers"""
 
     if add_query_params is None:
         add_query_params = []
@@ -74,8 +73,11 @@ def hello_world():
 
     return 'Hello, World!'
 
-#may need to clear the track dir?
-
+@APP.route('/status')
+def status():
+    """return status of ON or OFF to Bear"""
+    payload = {'resp': 'HI FRIEND!'}
+    return jsonify(payload)
 
 @APP.route('/playlists')
 def playlists():
@@ -84,33 +86,6 @@ def playlists():
     response = requests.get(playlists.format('playlists'))
     content_dict = xmltodict.parse(response.content)
     return jsonify(content_dict)
-
-# @APP.route('/track_list')
-# def tracklists():
-#     """send list of track names, album/artist names,
-#     etc to front end"""
-#     items = os.getenv('PLEX_PLAYLIST_ITEMS')
-#     response = requests.get(items.format('items'))
-#     tracks = xmltodict.parse(response.content)
-#     prefix = os.getenv('PLEX_TRACK_PREFIX')
-#     suffix = os.getenv('PLEX_PARAMS')
-#     for track in tracks['MediaContainer']['Track']:
-#         response = requests.get(prefix + track['@title'] + suffix)
-#         # print('/track_list' + track['@art'])
-#
-# @APP.route('/playlist_info')
-# def items():
-#     """access album art, song titles, and Album title"""
-#     items = os.getenv('PLEX_PLAYLIST_ITEMS')
-#     response = requests.get(items.format('items'))
-#     tracks = xmltodict.parse(response.content)
-#     prefix = os.getenv('PLEX_TRACK_PREFIX')
-#     suffix = os.getenv('PLEX_PARAMS')
-#     for track in tracks['MediaContainer']['Track']:
-#         response = requests.get(prefix + track['@art'] + suffix)
-#         print('tracks/' + track['@art'], 'wb')
-#         # open.write(response.content)
-#     return jsonify(tracks)
 
 @APP.route('/tracks')
 def items():
@@ -129,10 +104,3 @@ def items():
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-
-# @APP.route('/playlists/:p-id/items')
-# def itemId():
-#     """access each item/song in playlist"""
-#     id = requests.get()
-# flask route /playlists/:p-id/items
-# /tracks/:id
