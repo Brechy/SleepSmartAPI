@@ -19,11 +19,13 @@ def sha256(q_q):
     """Shortcut for getting hex digest of sha256 of string"""
     return hashlib.sha256(make_utf8(q_q)).hexdigest()
 
+
 def make_utf8(q_q):
     """Make a string utf8 if it isn't"""
     if not isinstance(q_q, bytes):
         q_q = str(q_q).encode('utf-8')
     return q_q
+
 
 # refers to application_top
 APP_ROOT = os.path.join(os.path.dirname(__file__), '.')
@@ -33,7 +35,6 @@ load_dotenv(DOTENV_PATH)
 APP = Flask(__name__)
 
 pprint(os.getenv('PLEX_URL'))
-
 
 
 def change_path(url, new_path, add_query_params=None):
@@ -73,13 +74,15 @@ def hello_world():
 
     return 'Hello, World!'
 
+
 @APP.route('/status')
 def status():
     """return status of ON or OFF to Bear"""
     payload = {'resp': 'HI FRIEND!'}
     return jsonify(payload)
 
-@APP.route('/tracks/:track_id')
+
+@APP.route('/tracks/<track_id>')
 def send_audio(track_id):
     """sending file from tracks dir"""
     return send_from_directory(os.getenv('TRACKS_FOLDER'),
@@ -94,10 +97,12 @@ def playlists():
     content_dict = xmltodict.parse(response.content)
     return jsonify(content_dict)
 
+
 @APP.route('/tracks')
 def items():
     """access items in playlists"""
-    items_url = change_path(os.getenv('PLEX_PLAYLISTS_URL'), "playlists/5238/items")
+    items_url = change_path(
+        os.getenv('PLEX_PLAYLISTS_URL'), "playlists/5238/items")
     response = requests.get(items_url)
     tracks = xmltodict.parse(response.content)
     for track in tracks['MediaContainer']['Track']:
@@ -107,6 +112,7 @@ def items():
         with open(os.path.join("tracks", sha256(track_key)) + '.flac', 'wb') as f_f:
             f_f.write(response.content)
     return jsonify(tracks)
+
 
 if __name__ == "__main__":
     import doctest
