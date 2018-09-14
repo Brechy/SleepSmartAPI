@@ -76,7 +76,7 @@ def hello_world():
 @APP.route('/status')
 def status():
     """return status of ON or OFF to Bear"""
-    payload = {'resp': 'HI FRIEND!'}
+    payload = {'resp': 'HI FRIEND!', 'audio': './tracks/e750402ee1641582a0fa9daa5dca92e8a1f46886e566264ce9e6b8efe0aa53c2.flac'}
     return jsonify(payload)
 
 @APP.route('/playlists')
