@@ -85,8 +85,11 @@ def status():
 @APP.route('/tracks/<track_id>')
 def send_audio(track_id):
     """sending file from tracks dir"""
+    pprint(track_id)
+    pprint(os.getenv('TRACKS_FOLDER'))
     return send_from_directory(os.getenv('TRACKS_FOLDER'),
                                track_id, as_attachment=True)
+
 
 
 @APP.route('/playlists')
