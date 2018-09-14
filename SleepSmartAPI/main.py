@@ -5,7 +5,7 @@ import os
 import urllib
 from pprint import pprint
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 import requests
 import xmltodict
 
@@ -76,8 +76,15 @@ def hello_world():
 @APP.route('/status')
 def status():
     """return status of ON or OFF to Bear"""
-    payload = {'resp': 'HI FRIEND!', 'audio': './tracks/e750402ee1641582a0fa9daa5dca92e8a1f46886e566264ce9e6b8efe0aa53c2.flac'}
+    payload = {'resp': 'HI FRIEND!'}
     return jsonify(payload)
+
+@APP.route('/tracks/:track_id')
+def send_audio(track_id):
+    """sending file from tracks dir"""
+    return send_from_directory(os.getenv('TRACKS_FOLDER'),
+                               track_id, as_attachment=True)
+
 
 @APP.route('/playlists')
 def playlists():
@@ -90,7 +97,7 @@ def playlists():
 @APP.route('/tracks')
 def items():
     """access items in playlists"""
-    items_url = change_path(os.getenv('PLEX_URL'), "playlists/5238/items")
+    items_url = change_path(os.getenv('PLEX_PLAYLISTS_URL'), "playlists/5238/items")
     response = requests.get(items_url)
     tracks = xmltodict.parse(response.content)
     for track in tracks['MediaContainer']['Track']:
