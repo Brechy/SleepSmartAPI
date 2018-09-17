@@ -96,7 +96,7 @@ def send_audio(track_id):
     pprint(track_id)
     pprint(os.getenv('TRACKS_FOLDER'))
     return send_from_directory(os.getenv('TRACKS_FOLDER'),
-                               track_id, as_attachment=True)
+                               track_id)
 
 
 @APP.route('/playlists')
