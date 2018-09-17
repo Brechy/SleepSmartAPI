@@ -32,7 +32,7 @@ APP_ROOT = os.path.join(os.path.dirname(__file__), '.')
 DOTENV_PATH = os.path.join(APP_ROOT, '.env')
 load_dotenv(DOTENV_PATH)
 
-APP = Flask(__name__)
+APP = Flask(__name__, static_folder='tracks')
 
 pprint(os.getenv('PLEX_URL'))
 
@@ -40,8 +40,10 @@ pprint(os.getenv('PLEX_URL'))
 def change_path(url, new_path, add_query_params=None):
     """Change a url's path and add query params/custom headers"""
 
+
     if add_query_params is None:
         add_query_params = []
+
 
     (scheme, netloc, _, query, fragment) = urllib.parse.urlsplit(url)
     q_q = urllib.parse.parse_qsl(query)
@@ -54,6 +56,7 @@ def change_path(url, new_path, add_query_params=None):
         make_utf8(urllib.parse.urlencode(newq)),
         make_utf8(fragment),
     ))  # NOQA
+
 
     return urllib.parse.urlunsplit((
         make_utf8(scheme),
@@ -72,14 +75,18 @@ def hello_world():
     'Hello, World!'
     """
 
-    return 'Hello, World!'
+    return 'Welcome to SleepSmart! Get some rest.'
 
 
 @APP.route('/status')
 def status():
     """return status of ON or OFF to Bear"""
-    play_info =
-    payload = {'resp': 'HI FRIEND!'}
+    payload = {'resp': 'HI FRIEND!', 'track_id': [
+        sha256('/library/parts/4149/1529174146/file.ogg') + '.ogg',
+        sha256('/library/parts/4426/1529174138/file.ogg') + '.ogg',
+        sha256('/library/parts/4029/1529181372/file.ogg') + '.ogg',
+        sha256('/library/parts/4057/1529183650/file.ogg') + '.ogg'
+        ]}
     return jsonify(payload)
 
 
@@ -90,7 +97,6 @@ def send_audio(track_id):
     pprint(os.getenv('TRACKS_FOLDER'))
     return send_from_directory(os.getenv('TRACKS_FOLDER'),
                                track_id, as_attachment=True)
-
 
 
 @APP.route('/playlists')
@@ -106,14 +112,14 @@ def playlists():
 def items():
     """access items in playlists"""
     items_url = change_path(
-        os.getenv('PLEX_PLAYLISTS_URL'), "playlists/5238/items")
+        os.getenv('PLEX_PLAYLIST_ITEMS'), "playlists/5329/items")
     response = requests.get(items_url)
     tracks = xmltodict.parse(response.content)
     for track in tracks['MediaContainer']['Track']:
         track_key = track['Media']['Part']['@key']
         response = requests.get(change_path(os.getenv('PLEX_URL'), track_key))
         pprint(track)
-        with open(os.path.join("tracks", sha256(track_key)) + '.flac', 'wb') as f_f:
+        with open(os.path.join("tracks", sha256(track_key)) + '.ogg', 'wb') as f_f:
             f_f.write(response.content)
     return jsonify(tracks)
 
