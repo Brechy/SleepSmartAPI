@@ -4,7 +4,8 @@ import os
 import urllib
 from pprint import pprint
 
-from flask import Flask, jsonify, send_from_directory
+from flask import jsonify, send_from_directory
+import flask
 import requests
 import xmltodict
 from dotenv import load_dotenv
@@ -16,7 +17,7 @@ APP_ROOT = os.path.join(os.path.dirname(__file__), '.')
 DOTENV_PATH = os.path.join(APP_ROOT, '.env')
 load_dotenv(DOTENV_PATH)
 
-APP = Flask(__name__, static_folder='tracks')
+APP = flask.Flask(__name__, static_folder='tracks')
 CORS(APP)
 
 pprint(os.getenv('PLEX_URL'))
@@ -75,22 +76,21 @@ def hello_world():
     return 'Welcome to SleepSmart! Get some rest.'
 
 
-@APP.route('/status', methods = ['GET', 'POST'])
-
-if request.method == 'GET':
+@APP.route('/status', methods=['GET', 'POST'])
+def status():
     """return status of ON to Bear with AUDIO attached"""
-    payload = {'resp': 'Play that funky music!', 'track_id': [
-        sha256('/library/parts/4149/1529174146/file.ogg') + '.ogg',
-        sha256('/library/parts/4426/1529174138/file.ogg') + '.ogg',
-        sha256('/library/parts/4029/1529181372/file.ogg') + '.ogg',
-        sha256('/library/parts/4057/1529183650/file.ogg') + '.ogg'
+    if flask.request.method == 'GET':
+        payload = {'resp': 'Play that funky music!', 'track_id': [
+            sha256('/library/parts/4149/1529174146/file.ogg') + '.ogg',
+            sha256('/library/parts/4426/1529174138/file.ogg') + '.ogg',
+            sha256('/library/parts/4029/1529181372/file.ogg') + '.ogg',
+            sha256('/library/parts/4057/1529183650/file.ogg') + '.ogg'
         ]}
-    return jsonify(payload)
+        return jsonify(payload)
 
-if request.method == 'POST':
-    """return status of OFF to Bear"""
-    payload = {'resp': 'Time to shut it down =^.^='}
-    return jsonify(payload)
+    if flask.request.method == 'POST':
+        payload = {'resp': 'Time to shut it down =^.^='}
+        return jsonify(payload)
 
 
 @APP.route('/tracks/<track_id>')
