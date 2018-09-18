@@ -6,12 +6,13 @@ import urllib
 from pprint import pprint
 
 from flask import Flask, jsonify, send_from_directory
+from flask_cors import CORS
 import requests
 import xmltodict
 
 from dotenv import load_dotenv
 
-
+os.system('ls -a')
 logging.basicConfig(level=logging.DEBUG)
 
 
@@ -33,7 +34,7 @@ DOTENV_PATH = os.path.join(APP_ROOT, '.env')
 load_dotenv(DOTENV_PATH)
 
 APP = Flask(__name__, static_folder='tracks')
-
+CORS(APP)
 pprint(os.getenv('PLEX_URL'))
 
 
