@@ -100,7 +100,7 @@ def status():
             bear_status = PLAYING_STATUS
         else:
             bear_status = STOPPED_STATUS
-        return
+        return '=^.^='
 
 @APP.route('/tracks/<track_id>')
 def send_audio(track_id):
