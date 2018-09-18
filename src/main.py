@@ -22,6 +22,10 @@ CORS(APP)
 
 pprint(os.getenv('PLEX_URL'))
 
+STOPPED_STATUS = 'STOPPED_STATUS'
+PLAYING_STATUS = 'PLAYING_STATUS'
+bear_status = STOPPED_STATUS
+
 
 def sha256(q_q):
     """Shortcut for getting hex digest of sha256 of string"""
@@ -38,10 +42,8 @@ def make_utf8(q_q):
 def change_path(url, new_path, add_query_params=None):
     """Change a url's path and add query params/custom headers"""
 
-
     if add_query_params is None:
         add_query_params = []
-
 
     (scheme, netloc, _, query, fragment) = urllib.parse.urlsplit(url)
     q_q = urllib.parse.parse_qsl(query)
@@ -54,7 +56,6 @@ def change_path(url, new_path, add_query_params=None):
         make_utf8(urllib.parse.urlencode(newq)),
         make_utf8(fragment),
     ))  # NOQA
-
 
     return urllib.parse.urlunsplit((
         make_utf8(scheme),
@@ -79,17 +80,26 @@ def hello_world():
 @APP.route('/status', methods=['GET', 'POST'])
 def status():
     """return status of ON to Bear with AUDIO attached"""
+
+    global bear_status
+
     if flask.request.method == 'GET':
-        payload = {'resp': 'Play that funky music!', 'track_id': [
-            sha256('/library/parts/4149/1529174146/file.ogg') + '.ogg',
-            sha256('/library/parts/4426/1529174138/file.ogg') + '.ogg',
-            sha256('/library/parts/4029/1529181372/file.ogg') + '.ogg',
-            sha256('/library/parts/4057/1529183650/file.ogg') + '.ogg'
-        ]}
+        payload = {
+            'resp': 'Play that funky music!',
+            'status': bear_status,
+            'track_id': [
+                sha256('/library/parts/4149/1529174146/file.ogg') + '.ogg',
+                sha256('/library/parts/4426/1529174138/file.ogg') + '.ogg',
+                sha256('/library/parts/4029/1529181372/file.ogg') + '.ogg',
+                sha256('/library/parts/4057/1529183650/file.ogg') + '.ogg'
+            ]}
         return jsonify(payload)
 
     if flask.request.method == 'POST':
-        payload = {'resp': 'Time to shut it down =^.^='}
+        if flask.request.json['status'] == 'PLAY':
+            bear_status = PLAYING_STATUS
+        else:
+            bear_status = STOPPED_STATUS
         return jsonify(payload)
 
 
