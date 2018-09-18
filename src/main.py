@@ -1,19 +1,25 @@
 """Main Flask API"""
 import hashlib
-import logging
 import os
 import urllib
 from pprint import pprint
 
 from flask import Flask, jsonify, send_from_directory
-from flask_cors import CORS
 import requests
 import xmltodict
-
 from dotenv import load_dotenv
 
+from flask_cors import CORS
 
-logging.basicConfig(level=logging.DEBUG)
+# refers to application_top
+APP_ROOT = os.path.join(os.path.dirname(__file__), '.')
+DOTENV_PATH = os.path.join(APP_ROOT, '.env')
+load_dotenv(DOTENV_PATH)
+
+APP = Flask(__name__, static_folder='tracks')
+CORS(APP)
+
+pprint(os.getenv('PLEX_URL'))
 
 
 def sha256(q_q):
@@ -26,17 +32,6 @@ def make_utf8(q_q):
     if not isinstance(q_q, bytes):
         q_q = str(q_q).encode('utf-8')
     return q_q
-
-
-# refers to application_top
-APP_ROOT = os.path.join(os.path.dirname(__file__), '.')
-DOTENV_PATH = os.path.join(APP_ROOT, '.env')
-load_dotenv(DOTENV_PATH)
-
-APP = Flask(__name__, static_folder='tracks')
-CORS(APP)
-
-pprint(os.getenv('PLEX_URL'))
 
 
 def change_path(url, new_path, add_query_params=None):
@@ -80,15 +75,21 @@ def hello_world():
     return 'Welcome to SleepSmart! Get some rest.'
 
 
-@APP.route('/status')
-def status():
-    """return status of ON or OFF to Bear"""
-    payload = {'resp': 'HI FRIEND!', 'track_id': [
+@APP.route('/status', methods = ['GET', 'POST'])
+
+if request.method == 'GET':
+    """return status of ON to Bear with AUDIO attached"""
+    payload = {'resp': 'Play that funky music!', 'track_id': [
         sha256('/library/parts/4149/1529174146/file.ogg') + '.ogg',
         sha256('/library/parts/4426/1529174138/file.ogg') + '.ogg',
         sha256('/library/parts/4029/1529181372/file.ogg') + '.ogg',
         sha256('/library/parts/4057/1529183650/file.ogg') + '.ogg'
         ]}
+    return jsonify(payload)
+
+if request.method == 'POST':
+    """return status of OFF to Bear"""
+    payload = {'resp': 'Time to shut it down =^.^='}
     return jsonify(payload)
 
 
