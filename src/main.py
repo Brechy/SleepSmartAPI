@@ -124,7 +124,7 @@ def playlists():
 def items():
     """access items in playlists"""
     items_url = change_path(
-        os.getenv('PLEX_PLAYLIST_ITEMS'), "playlists/5329/items")
+        os.getenv('PLEX_PLAYLIST_ITEMS'), "playlists/5353/items")
     response = requests.get(items_url)
     tracks = xmltodict.parse(response.content)
     for track in tracks['MediaContainer']['Track']:
