@@ -88,10 +88,12 @@ def status():
             'resp': 'Play that funky music!',
             'status': bear_status,
             'track_id': [
-                sha256('/library/parts/4149/1529174146/file.ogg') + '.ogg',
-                sha256('/library/parts/4426/1529174138/file.ogg') + '.ogg',
-                sha256('/library/parts/4029/1529181372/file.ogg') + '.ogg',
-                sha256('/library/parts/4057/1529183650/file.ogg') + '.ogg'
+                sha256('/library/parts/5190/1518806852/file.opus') + '.opus',
+                sha256('/library/parts/5192/1496247087/file.opus') + '.opus',
+                sha256('/library/parts/5194/1537019238/file.opus') + '.opus',
+                sha256('/library/parts/5193/1457284625/file.opus') + '.opus',
+                sha256('/library/parts/5191/1525458211/file.opus') + '.opus'
+
             ]}
         return jsonify(payload)
 
